@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fan Guys — Cost Estimator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    ::selection { background: #f59e0b; color: #000000; }
+
+    body {
+      background: #000000;
+      color: #e8dcc8;
+      font-family: 'Barlow Condensed', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    #header {
+      background: #000000;
+      border-bottom: 1px solid rgba(245,158,11,0.2);
+      padding: 2rem 1.5rem 1.5rem;
+    }
+    #header .inner { max-width: 520px; margin: 0 auto; }
+    #header .top { display: flex; align-items: center; gap: .75rem; }
+    #header .icon { font-size: 2rem; line-height: 1; }
+    #header .brand { font-size: .7rem; font-weight: 700; letter-spacing: .25em; text-transform: uppercase; color: #f59e0b; margin-bottom: .1rem; }
+    #header h1 { font-size: 1.9rem; font-weight: 900; letter-spacing: .05em; line-height: 1; color: #e8dcc8; }
+    #header .sub { font-family: 'Barlow', sans-serif; font-size: .85rem; color: #6b7280; font-weight: 300; margin-top: .5rem; }
+
+    /* ── Wrapper ── */
+    #app { max-width: 520px; margin: 0 auto; padding: 1.5rem; }
+
+    /* ── Section spacing ── */
+    .section { margin-bottom: 1.4rem; }
+
+    /* ── Labels ── */
+    .label {
+      font-size: .78rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: #6b7280; margin-bottom: .5rem; display: block;
+    }
+    .label span { text-transform: none; letter-spacing: 0; font-weight: 400; }
+    .sub-text { font-size: .78rem; color: #6b7280; margin-top: .3rem; font-family: 'Barlow', sans-serif; font-weight: 300; }
+
+    /* ── Input ── */
+    input[type="text"], input[type="number"] {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: #e8dcc8;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem; font-weight: 600; letter-spacing: .05em;
+      padding: .7rem 1rem; border-radius: 4px; width: 100%;
+      transition: border-color .2s, background .2s; outline: none;
+    }
+    input[type="text"]:focus, input[type="number"]:focus {
+      border-color: #f59e0b; background: rgba(245,158,11,0.07);
+    }
+    input[type="number"]::-webkit-inner-spin-button { opacity: .4; }
+
+    /* ── Pill buttons ── */
+    .pill-group { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid rgba(245,158,11,0.25); }
+    .pill-btn {
+      flex: 1; padding: .65rem .4rem; cursor: pointer; border: none;
+      background: rgba(255,255,255,0.03); color: #9ca3af;
+      font-family: 'Barlow Condensed', sans-serif; font-size: .82rem;
+      font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      transition: all .2s; border-right: 1px solid rgba(245,158,11,0.15);
+    }
+    .pill-btn:last-child { border-right: none; }
+    .pill-btn.active { background: #f59e0b; color: #000000; }
+    .pill-btn:not(.active):hover { background: rgba(245,158,11,0.12); color: #e8dcc8; }
+
+    /* ── Counter ── */
+    .counter-row { display: flex; align-items: center; gap: 1rem; }
+    .counter-btn {
+      width: 40px; height: 40px; border-radius: 4px;
+      border: 1px solid rgba(245,158,11,0.3);
+      background: rgba(255,255,255,0.04); color: #f59e0b;
+      font-size: 1.4rem; cursor: pointer;
+      transition: all .15s; display: flex; align-items: center; justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+    }
+    .counter-btn:hover { background: #f59e0b; color: #000000; }
+    .counter-display { flex: 1; text-align: center; }
+    .counter-num { font-size: 2.5rem; font-weight: 900; color: #f59e0b; line-height: 1; }
+    .counter-unit { font-size: 1rem; color: #6b7280; margin-left: .4rem; }
+    .counter-note { text-align: center; margin-top: .4rem; font-size: .78rem; color: #6b7280; font-family: 'Barlow', sans-serif; }
+    .counter-note strong { color: #f59e0b; }
+
+    /* ── Tier grid ── */
+    .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+    .tier-card {
+      border-radius: 6px; padding: .6rem .75rem; cursor: pointer;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      transition: all .18s;
+    }
+    .tier-card:hover { background: rgba(255,255,255,0.06); }
+    .tier-card.selected { background: rgba(255,255,255,0.07); }
+    .tier-name { font-size: .9rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; }
+    .tier-rates { font-size: .72rem; color: #6b7280; font-family: 'Barlow', sans-serif; margin-top: .2rem; }
+    #reset-auto { background: none; border: none; color: #6b7280; font-family: 'Barlow', sans-serif; font-size: .75rem; cursor: pointer; text-decoration: underline; padding: 0; margin-top: .4rem; display: none; }
+
+    /* ── Location feedback ── */
+    #zip-feedback { margin-top: .45rem; font-size: .82rem; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; letter-spacing: .05em; min-height: 1.2rem; }
+    #zip-error { margin-top: .45rem; font-size: .78rem; color: #f87171; font-family: 'Barlow', sans-serif; display: none; }
+    .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(245,158,11,0.3); border-top-color: #f59e0b; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: .4rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Miles section ── */
+    #miles-section { display: none; }
+
+    /* ── Calc button ── */
+    #calc-btn {
+      width: 100%; padding: 1rem; background: #f59e0b; color: #000000;
+      border: none; border-radius: 6px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.35rem; font-weight: 900; letter-spacing: .15em; text-transform: uppercase;
+      cursor: pointer; transition: all .2s; margin-top: .5rem;
+    }
+    #calc-btn:hover:not(:disabled) { background: #fbbf24; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245,158,11,0.35); }
+    #calc-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── Results ── */
+    #results { display: none; margin-top: 2rem; animation: slideUp .4s ease forwards; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .glow-line { height: 2px; background: linear-gradient(90deg, transparent, #f59e0b, transparent); margin: 1.5rem 0; }
+
+    #result-summary { margin-bottom: 1.25rem; }
+    #result-summary .eyebrow { font-size: .7rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #f59e0b; margin-bottom: .25rem; }
+    #result-summary .desc { font-size: 1rem; color: #9ca3af; font-family: 'Barlow', sans-serif; font-weight: 300; }
+    #result-summary .city-badge { margin-top: .3rem; font-size: .8rem; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; letter-spacing: .06em; }
+
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(245,158,11,0.15);
+      border-radius: 8px; padding: 1.25rem 1.5rem;
+    }
+    .edit-hint { font-size: .7rem; color: #4b5563; font-family: 'Barlow', sans-serif; margin-bottom: .5rem; font-style: italic; }
+
+    .line-item {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: .65rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); gap: .75rem;
+    }
+    .line-item:last-child { border-bottom: none; }
+    .line-label { font-size: 1rem; font-weight: 600; letter-spacing: .03em; }
+    .line-detail { font-size: .75rem; color: #6b7280; font-family: 'Barlow', sans-serif; }
+    .edited-tag { font-size: .62rem; margin-left: .4rem; color: #f59e0b; opacity: .7; }
+
+    /* Editable value button */
+    .editable-val {
+      background: none; border: 1px dashed rgba(245,158,11,0.3); border-radius: 4px;
+      color: #e8dcc8; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      padding: .15rem .4rem; transition: all .15s; white-space: nowrap; flex-shrink: 0;
+    }
+    .editable-val:hover { border-color: #f59e0b; color: #f59e0b; }
+    .editable-input {
+      width: 90px; text-align: right; background: rgba(245,158,11,0.12);
+      border: 1px solid #f59e0b; border-radius: 4px; color: #f59e0b;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700;
+      padding: .15rem .4rem; outline: none; flex-shrink: 0;
+    }
+
+    #reset-edits-row { text-align: right; margin-bottom: .75rem; display: none; }
+    #reset-edits { background: none; border: none; color: #6b7280; font-family: 'Barlow', sans-serif; font-size: .75rem; cursor: pointer; text-decoration: underline; padding: 0; }
+
+    /* Totals card */
+    #totals-card { background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.3); }
+    .total-row { display: flex; justify-content: space-between; align-items: baseline; padding: .65rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .total-row:last-child { border-bottom: none; }
+    .total-label { font-size: 1rem; font-weight: 600; color: #9ca3af; }
+    .total-val { font-size: 1.2rem; font-weight: 700; color: #e8dcc8; }
+    .total-val.green { color: #10b981; }
+    #quote-row { margin-top: .75rem; padding-top: .75rem; border-top: 1px solid rgba(245,158,11,0.3); display: flex; justify-content: space-between; align-items: baseline; }
+    #quote-label { font-size: 1.1rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #f59e0b; }
+    #quote-val { font-size: 2rem; font-weight: 900; color: #f59e0b; letter-spacing: .02em; }
+    #labor-note { text-align: right; font-size: .72rem; color: #6b7280; font-family: 'Barlow', sans-serif; margin-top: .25rem; }
+
+    #new-estimate-btn {
+      width: 100%; padding: 1rem; background: transparent;
+      border: 1px solid rgba(245,158,11,0.3); border-radius: 6px; color: #f59e0b;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 1.35rem;
+      font-weight: 900; letter-spacing: .15em; text-transform: uppercase;
+      cursor: pointer; transition: all .2s; margin-top: 1rem;
+    }
+    #new-estimate-btn:hover { background: rgba(245,158,11,0.08); }
+
+    .tier-manual-note { color: #f59e0b; font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: .5rem; font-size: .78rem; }
+    .tier-auto-note { color: #4b5563; font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: .5rem; font-size: .78rem; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div id="header">
+  <div class="inner">
+    <div class="top">
+      <div class="icon">🌀</div>
+      <div>
+        <div class="brand">Fan Guys</div>
+        <h1>COST ESTIMATOR</h1>
+      </div>
+    </div>
+    <p class="sub">Material &amp; travel costs — labor not included</p>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+
+  <!-- Zip Code -->
+  <div class="section">
+    <label class="label" for="zip-input">Job Site Zip Code <span>(optional — auto-selects tier)</span></label>
+    <input type="text" id="zip-input" maxlength="5" placeholder="Enter zip to auto-detect city" />
+    <div id="zip-feedback"></div>
+    <div id="zip-error"></div>
+  </div>
+
+  <!-- Market Tier -->
+  <div class="section">
+    <div class="label">Market Tier <span id="tier-note"></span></div>
+    <div class="tier-grid" id="tier-grid"></div>
+    <button id="reset-auto">Reset to auto</button>
+  </div>
+
+  <!-- Install Type -->
+  <div class="section">
+    <div class="label">Install Type</div>
+    <div class="pill-group">
+      <button class="pill-btn active" data-install="turnkey">Turnkey</button>
+      <button class="pill-btn" data-install="mechanical_connections">Mech + Wire</button>
+      <button class="pill-btn" data-install="mechanical_only">Mech Only</button>
+    </div>
+    <div class="sub-text" id="install-desc">You install fan + run all power to fan &amp; controller</div>
+  </div>
+
+  <!-- Number of Fans -->
+  <div class="section">
+    <div class="label">Number of Fans</div>
+    <div class="counter-row">
+      <button class="counter-btn" id="fans-minus">−</button>
+      <div class="counter-display">
+        <span class="counter-num" id="fans-num">1</span>
+        <span class="counter-unit" id="fans-unit">fan</span>
+      </div>
+      <button class="counter-btn" id="fans-plus">+</button>
+    </div>
+    <div class="counter-note" id="days-note">Estimated job: <strong>4 days</strong> (2 work days + 2 travel days)</div>
+  </div>
+
+  <!-- Crew Size -->
+  <div class="section">
+    <div class="label">Crew Size</div>
+    <div class="counter-row">
+      <button class="counter-btn" id="crew-minus">−</button>
+      <div class="counter-display">
+        <span class="counter-num" id="crew-num">1</span>
+        <span class="counter-unit" id="crew-unit">person</span>
+      </div>
+      <button class="counter-btn" id="crew-plus">+</button>
+    </div>
+  </div>
+
+  <!-- Travel Mode -->
+  <div class="section">
+    <div class="label">Travel Mode</div>
+    <div class="pill-group">
+      <button class="pill-btn active" data-travel="fly">✈ Fly</button>
+      <button class="pill-btn" data-travel="drive">🚗 Drive</button>
+    </div>
+    <div class="sub-text">Rental car included either way</div>
+  </div>
+
+  <!-- Miles (drive only) -->
+  <div class="section" id="miles-section">
+    <label class="label" for="miles-input">One-Way Miles to Job Site</label>
+    <input type="number" id="miles-input" min="0" placeholder="e.g. 320" />
+    <div class="sub-text">Round-trip calculated at $0.67/mile</div>
+  </div>
+
+  <button id="calc-btn">Calculate Estimate</button>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="glow-line"></div>
+
+    <div id="result-summary">
+      <div class="eyebrow">Estimate Summary</div>
+      <div class="desc" id="result-desc"></div>
+      <div class="city-badge" id="result-city"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:1.25rem">
+      <div class="edit-hint">Click any amount to edit it</div>
+      <div id="line-items"></div>
+    </div>
+
+    <div id="reset-edits-row">
+      <button id="reset-edits">Reset all edits</button>
+    </div>
+
+    <div class="card" id="totals-card">
+      <div class="total-row">
+        <span class="total-label">Total Cost</span>
+        <span class="total-val" id="total-cost-val"></span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">Margin (30%)</span>
+        <span class="total-val green" id="margin-val"></span>
+      </div>
+      <div id="quote-row">
+        <span id="quote-label">Suggested Quote</span>
+        <span id="quote-val"></span>
+      </div>
+      <div id="labor-note">Labor not included</div>
+    </div>
+
+    <button id="new-estimate-btn">New Estimate</button>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────
+const HOTEL_TIERS = {
+  cheap:         { label: 'Budget',   color: '#34d399', hotel: 130, car: 50  },
+  average:       { label: 'Standard', color: '#f59e0b', hotel: 170, car: 100 },
+  expensive:     { label: 'High',     color: '#fb923c', hotel: 220, car: 140 },
+  veryExpensive: { label: 'Premium',  color: '#f87171', hotel: 280, car: 140 },
+};
+
+const CITY_TIER_MAP = [
+  { match: ['new york','brooklyn','bronx','queens','manhattan','staten island'], tier: 'veryExpensive' },
+  { match: ['san francisco','san jose','oakland','berkeley','palo alto','santa clara','sunnyvale','mountain view'], tier: 'veryExpensive' },
+  { match: ['boston','cambridge','somerville'], tier: 'veryExpensive' },
+  { match: ['chicago','evanston'], tier: 'veryExpensive' },
+  { match: ['miami','miami beach','fort lauderdale','boca raton','coral gables'], tier: 'veryExpensive' },
+  { match: ['los angeles','santa monica','beverly hills','west hollywood','burbank','glendale','pasadena','long beach'], tier: 'veryExpensive' },
+  { match: ['seattle','bellevue','redmond','kirkland'], tier: 'veryExpensive' },
+  { match: ['washington','arlington','alexandria','bethesda','silver spring'], tier: 'veryExpensive' },
+  { match: ['honolulu','waikiki'], tier: 'veryExpensive' },
+  { match: ['new orleans'], tier: 'veryExpensive' },
+  { match: ['denver','aurora','boulder'], tier: 'veryExpensive' },
+  { match: ['austin'], tier: 'veryExpensive' },
+  { match: ['san diego','la jolla','chula vista'], tier: 'veryExpensive' },
+  { match: ['portland'], tier: 'veryExpensive' },
+  { match: ['minneapolis','saint paul'], tier: 'veryExpensive' },
+  { match: ['phoenix','scottsdale','tempe','mesa','chandler','gilbert','glendale','peoria'], tier: 'expensive' },
+  { match: ['dallas','fort worth','arlington','irving','plano','frisco','mckinney','garland'], tier: 'expensive' },
+  { match: ['el paso'], tier: 'expensive' },
+  { match: ['houston','sugar land','the woodlands'], tier: 'expensive' },
+  { match: ['san antonio'], tier: 'expensive' },
+  { match: ['nashville','brentwood','franklin'], tier: 'expensive' },
+  { match: ['charlotte','raleigh','durham','chapel hill'], tier: 'expensive' },
+  { match: ['atlanta','sandy springs','alpharetta','marietta','decatur'], tier: 'expensive' },
+  { match: ['las vegas','henderson','north las vegas'], tier: 'expensive' },
+  { match: ['orlando','kissimmee','lake buena vista','anaheim'], tier: 'expensive' },
+  { match: ['tampa','st. petersburg','clearwater','sarasota'], tier: 'expensive' },
+  { match: ['jacksonville'], tier: 'expensive' },
+  { match: ['kansas city','overland park','olathe'], tier: 'expensive' },
+  { match: ['columbus','cincinnati','cleveland'], tier: 'expensive' },
+  { match: ['pittsburgh'], tier: 'expensive' },
+  { match: ['philadelphia','camden','wilmington'], tier: 'expensive' },
+  { match: ['baltimore'], tier: 'expensive' },
+  { match: ['detroit','ann arbor','dearborn'], tier: 'expensive' },
+  { match: ['st. louis','saint louis'], tier: 'expensive' },
+  { match: ['salt lake city','provo','ogden'], tier: 'expensive' },
+  { match: ['albuquerque','santa fe'], tier: 'expensive' },
+  { match: ['tucson'], tier: 'expensive' },
+  { match: ['memphis'], tier: 'expensive' },
+  { match: ['louisville'], tier: 'expensive' },
+  { match: ['richmond','virginia beach','norfolk'], tier: 'expensive' },
+  { match: ['indianapolis'], tier: 'expensive' },
+  { match: ['milwaukee'], tier: 'expensive' },
+  { match: ['oklahoma city','tulsa'], tier: 'expensive' },
+  { match: ['omaha','lincoln'], tier: 'expensive' },
+  { match: ['baton rouge','shreveport'], tier: 'expensive' },
+  { match: ['sacramento','fresno','bakersfield','stockton'], tier: 'expensive' },
+];
+
+const INSTALL_DESCRIPTIONS = {
+  turnkey: 'You install fan + run all power to fan & controller',
+  mechanical_connections: 'You install fan & wire motor/controller; customer brings power',
+  mechanical_only: 'Mount & install fan only — no wiring',
+};
+
+const INSTALL_LABELS = {
+  turnkey: 'Full Turnkey (w/ Electrical)',
+  mechanical_connections: 'Mechanical w/ Connections',
+  mechanical_only: 'Mechanical Only',
+};
+
+// ── State ─────────────────────────────────────────────────────────────────
+let fans = 1, crewSize = 1, installType = 'turnkey', travelMode = 'fly', miles = 0;
+let zipCode = '', locationInfo = null, manualTier = null, zipLoading = false;
+let overrides = {};
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function getCityTier(city) {
+  const lower = city.toLowerCase();
+  for (const e of CITY_TIER_MAP) if (e.match.some(m => lower.includes(m))) return e.tier;
+  return 'average';
+}
+
+function calcDays(f, type) {
+  if (type === 'turnkey') return f === 0 ? 0 : 3 + f;
+  return f === 0 ? 0 : 2 + Math.ceil(f * 0.5);
+}
+
+function activeTier() { return manualTier !== null ? manualTier : (locationInfo ? locationInfo.tier : 'average'); }
+function tierData() { return HOTEL_TIERS[activeTier()]; }
+function fmt(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+function baseVal(key) {
+  const days = calcDays(fans, installType);
+  const td = tierData();
+  switch (key) {
+    case 'steel':      return fans * 200;
+    case 'electrical': return installType === 'turnkey' ? fans * 900 : 0;
+    case 'lift':       return 250 * days;
+    case 'car':        return td.car * days;
+    case 'hotel':      return td.hotel * (days - 1) * crewSize;
+    case 'flights':    return travelMode === 'fly' ? 1200 * crewSize : 0;
+    case 'fuel':       return travelMode === 'fly' ? 100 * Math.max(0, days - 2) : 0;
+    case 'mileage':    return travelMode === 'drive' ? miles * 0.67 * 2 : 0;
+  }
+  return 0;
+}
+
+function getVal(key) { return overrides[key] !== undefined ? overrides[key] : baseVal(key); }
+
+function lineItems() {
+  const days = calcDays(fans, installType);
+  const td = tierData();
+  const wd = Math.max(0, days - 2);
+  return [
+    { key: 'steel',      label: 'Steel Angle Iron',    detail: `${fans} fan${fans>1?'s':''} × $200`,                                              show: true, highlight: false },
+    { key: 'electrical', label: 'Electrical Material', detail: `${fans} fan${fans>1?'s':''} × $900`,                                              show: installType === 'turnkey', highlight: false },
+    { key: 'lift',       label: 'Scissor Lift Rental', detail: `${days} days × $250/day`,                                                         show: true, highlight: false },
+    { key: 'car',        label: 'Rental Car',          detail: `${days} days × $${td.car}/day`,                                                   show: true, highlight: true },
+    { key: 'hotel',      label: 'Hotel',               detail: `${days-1} night${days-1!==1?'s':''} × $${td.hotel}/night × ${crewSize} person${crewSize>1?'s':''}`, show: true, highlight: true },
+    { key: 'flights',    label: 'Round-Trip Flights',  detail: `$1,200 × ${crewSize} person${crewSize>1?'s':''}`,                                  show: travelMode === 'fly', highlight: false },
+    { key: 'fuel',       label: 'On-Site Fuel',        detail: `${wd} work day${wd!==1?'s':''} × $100`,                                           show: travelMode === 'fly', highlight: false },
+    { key: 'mileage',    label: 'Mileage',             detail: `${miles} mi × 2 (RT) × $0.67`,                                                    show: travelMode === 'drive', highlight: false },
+  ].filter(i => i.show);
+}
+
+// ── Build Tier Grid ───────────────────────────────────────────────────────
+function renderTierGrid() {
+  const grid = document.getElementById('tier-grid');
+  grid.innerHTML = '';
+  const at = activeTier();
+  Object.entries(HOTEL_TIERS).forEach(([key, t]) => {
+    const div = document.createElement('div');
+    div.className = 'tier-card' + (at === key ? ' selected' : '');
+    div.style.borderColor = at === key ? t.color : 'rgba(255,255,255,0.08)';
+    div.innerHTML = `<div class="tier-name" style="color:${at === key ? t.color : '#9ca3af'}">${t.label}</div>
+                     <div class="tier-rates">Hotel $${t.hotel}/night · Car $${t.car}/day</div>`;
+    div.addEventListener('click', () => {
+      manualTier = key;
+      overrides = {};
+      renderTierGrid();
+      updateTierNote();
+      updateDaysNote();
+    });
+    grid.appendChild(div);
+  });
+}
+
+function updateTierNote() {
+  const note = document.getElementById('tier-note');
+  const resetBtn = document.getElementById('reset-auto');
+  if (manualTier !== null) {
+    note.innerHTML = '<span class="tier-manual-note">— manually selected</span>';
+    resetBtn.style.display = locationInfo ? 'inline' : 'none';
+    resetBtn.textContent = `Reset to auto (${HOTEL_TIERS[locationInfo ? locationInfo.tier : 'average'].label})`;
+  } else if (locationInfo) {
+    note.innerHTML = '<span class="tier-auto-note">— auto from zip</span>';
+    resetBtn.style.display = 'none';
+  } else {
+    note.textContent = '';
+    resetBtn.style.display = 'none';
+  }
+}
+
+// ── Days note ─────────────────────────────────────────────────────────────
+function updateDaysNote() {
+  const days = calcDays(fans, installType);
+  const wd = Math.max(0, days - 2);
+  document.getElementById('days-note').innerHTML =
+    `Estimated job: <strong>${days} days</strong> (${wd} work day${wd!==1?'s':''} + 2 travel days)`;
+}
+
+// ── Zip lookup ────────────────────────────────────────────────────────────
+let zipTimer = null;
+async function lookupZip(zip) {
+  const fb = document.getElementById('zip-feedback');
+  const err = document.getElementById('zip-error');
+  if (zip.length !== 5) { fb.textContent = ''; err.style.display = 'none'; locationInfo = null; renderTierGrid(); updateTierNote(); return; }
+  zipLoading = true;
+  document.getElementById('calc-btn').disabled = true;
+  fb.innerHTML = '<span class="spinner"></span><span style="font-size:.78rem;color:#6b7280;font-family:\'Barlow\',sans-serif">Looking up city...</span>';
+  err.style.display = 'none';
+  try {
+    const res = await fetch(`https://api.zippopotam.us/us/${zip}`);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const place = data.places?.[0];
+    if (!place) throw new Error();
+    const city = place['place name'], state = place['state'];
+    const tier = getCityTier(city);
+    locationInfo = { city, state, tier };
+    const td = HOTEL_TIERS[activeTier()];
+    fb.innerHTML = `<span style="color:${td.color}">📍 ${city}, ${state}</span>${manualTier===null?`<span style="color:#6b7280;font-weight:400"> — auto-selected: ${td.label}</span>`:''}`;
+    err.style.display = 'none';
+  } catch {
+    locationInfo = null;
+    fb.textContent = '';
+    err.textContent = 'Zip not found — using selected tier';
+    err.style.display = 'block';
+  }
+  zipLoading = false;
+  document.getElementById('calc-btn').disabled = false;
+  renderTierGrid();
+  updateTierNote();
+}
+
+document.getElementById('zip-input').addEventListener('input', e => {
+  zipCode = e.target.value.replace(/\D/g,'').slice(0,5);
+  e.target.value = zipCode;
+  overrides = {};
+  clearTimeout(zipTimer);
+  zipTimer = setTimeout(() => lookupZip(zipCode), 400);
+});
+
+// ── Reset auto ────────────────────────────────────────────────────────────
+document.getElementById('reset-auto').addEventListener('click', () => {
+  manualTier = null; overrides = {};
+  renderTierGrid(); updateTierNote(); updateDaysNote();
+});
+
+// ── Install type ──────────────────────────────────────────────────────────
+document.querySelectorAll('[data-install]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    installType = btn.dataset.install;
+    document.querySelectorAll('[data-install]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('install-desc').textContent = INSTALL_DESCRIPTIONS[installType];
+    overrides = {}; updateDaysNote();
+    document.getElementById('results').style.display = 'none';
+  });
+});
+
+// ── Fans counter ──────────────────────────────────────────────────────────
+document.getElementById('fans-minus').addEventListener('click', () => {
+  if (fans > 1) { fans--; overrides = {}; updateFansDisplay(); updateDaysNote(); document.getElementById('results').style.display = 'none'; }
+});
+document.getElementById('fans-plus').addEventListener('click', () => {
+  fans++; overrides = {}; updateFansDisplay(); updateDaysNote(); document.getElementById('results').style.display = 'none';
+});
+function updateFansDisplay() {
+  document.getElementById('fans-num').textContent = fans;
+  document.getElementById('fans-unit').textContent = fans === 1 ? 'fan' : 'fans';
+}
+
+// ── Crew counter ──────────────────────────────────────────────────────────
+document.getElementById('crew-minus').addEventListener('click', () => {
+  if (crewSize > 1) { crewSize--; overrides = {}; updateCrewDisplay(); document.getElementById('results').style.display = 'none'; }
+});
+document.getElementById('crew-plus').addEventListener('click', () => {
+  crewSize++; overrides = {}; updateCrewDisplay(); document.getElementById('results').style.display = 'none';
+});
+function updateCrewDisplay() {
+  document.getElementById('crew-num').textContent = crewSize;
+  document.getElementById('crew-unit').textContent = crewSize === 1 ? 'person' : 'persons';
+}
+
+// ── Travel mode ───────────────────────────────────────────────────────────
+document.querySelectorAll('[data-travel]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    travelMode = btn.dataset.travel;
+    document.querySelectorAll('[data-travel]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('miles-section').style.display = travelMode === 'drive' ? 'block' : 'none';
+    overrides = {};
+    document.getElementById('results').style.display = 'none';
+  });
+});
+document.getElementById('miles-input').addEventListener('input', e => {
+  miles = parseFloat(e.target.value) || 0; overrides = {};
+  document.getElementById('results').style.display = 'none';
+});
+
+// ── Editable value ────────────────────────────────────────────────────────
+function makeEditable(key, currentVal) {
+  const td = tierData();
+  const wrapper = document.createElement('span');
+
+  function showBtn() {
+    wrapper.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.className = 'editable-val';
+    btn.title = 'Click to edit';
+    const isEdited = overrides[key] !== undefined;
+    btn.textContent = '$' + Math.round(getVal(key)).toLocaleString('en-US') + ' ✎';
+    btn.addEventListener('click', () => showInput());
+    wrapper.appendChild(btn);
+  }
+
+  function showInput() {
+    wrapper.innerHTML = '';
+    const inp = document.createElement('input');
+    inp.type = 'number'; inp.className = 'editable-input';
+    inp.value = Math.round(getVal(key));
+    inp.addEventListener('blur', commit);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') showBtn(); });
+    wrapper.appendChild(inp);
+    setTimeout(() => { inp.focus(); inp.select(); }, 10);
+
+    function commit() {
+      const n = parseFloat(inp.value);
+      if (!isNaN(n) && n >= 0) overrides[key] = Math.round(n);
+      showBtn();
+      recalcTotals();
+      document.getElementById('reset-edits-row').style.display =
+        Object.keys(overrides).length > 0 ? 'block' : 'none';
+    }
+  }
+
+  showBtn();
+  return wrapper;
+}
+
+// ── Recalc totals only (no full re-render) ────────────────────────────────
+function recalcTotals() {
+  const items = lineItems();
+  const total = items.reduce((s, i) => s + getVal(i.key), 0);
+  const suggested = total / (1 - 0.3);
+  const margin = suggested - total;
+  document.getElementById('total-cost-val').textContent = fmt(total);
+  document.getElementById('margin-val').textContent = '+' + fmt(margin);
+  document.getElementById('quote-val').textContent = fmt(suggested);
+}
+
+// ── Calculate ─────────────────────────────────────────────────────────────
+document.getElementById('calc-btn').addEventListener('click', async () => {
+  if (zipCode.length === 5 && !locationInfo && !zipLoading) await lookupZip(zipCode);
+  overrides = {};
+  renderResults();
+});
+
+function renderResults() {
+  const days = calcDays(fans, installType);
+  const wd = Math.max(0, days - 2);
+  const td = tierData();
+  const at = activeTier();
+  const items = lineItems();
+
+  // Summary
+  document.getElementById('result-desc').textContent =
+    `${fans} fan${fans>1?'s':''} · ${INSTALL_LABELS[installType]} · ${crewSize} person${crewSize>1?'s':''} · ${days} days`;
+
+  const cityBadge = document.getElementById('result-city');
+  if (locationInfo) {
+    cityBadge.innerHTML = `<span style="font-size:.8rem;color:#6b7280;font-family:'Barlow',sans-serif">📍 ${locationInfo.city}, ${locationInfo.state}</span>
+      <span style="margin-left:.5rem;color:${td.color}">${td.label} Market</span>`;
+  } else {
+    cityBadge.innerHTML = `<span style="color:${td.color}">${td.label} Market</span>`;
+  }
+
+  // Line items
+  const lineDiv = document.getElementById('line-items');
+  lineDiv.innerHTML = '';
+  items.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'line-item';
+    const left = document.createElement('div');
+    left.style.flex = '1';
+    left.style.minWidth = '0';
+
+    const labelEl = document.createElement('div');
+    labelEl.className = 'line-label';
+    labelEl.style.color = item.highlight ? td.color : '#e8dcc8';
+    labelEl.textContent = item.label;
+
+    const detailEl = document.createElement('div');
+    detailEl.className = 'line-detail';
+    detailEl.textContent = item.detail;
+
+    left.appendChild(labelEl);
+    left.appendChild(detailEl);
+    row.appendChild(left);
+    row.appendChild(makeEditable(item.key, getVal(item.key)));
+    lineDiv.appendChild(row);
+  });
+
+  // Reset edits
+  document.getElementById('reset-edits-row').style.display = 'none';
+
+  // Totals
+  recalcTotals();
+
+  const resultsEl = document.getElementById('results');
+  resultsEl.style.display = 'block';
+  resultsEl.style.animation = 'none';
+  void resultsEl.offsetWidth;
+  resultsEl.style.animation = 'slideUp 0.4s ease forwards';
+  setTimeout(() => resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+// ── Reset edits ───────────────────────────────────────────────────────────
+document.getElementById('reset-edits').addEventListener('click', () => {
+  overrides = {};
+  renderResults();
+});
+
+// ── New estimate ──────────────────────────────────────────────────────────
+document.getElementById('new-estimate-btn').addEventListener('click', () => {
+  overrides = {};
+  document.getElementById('results').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────
+renderTierGrid();
+updateTierNote();
+updateDaysNote();
+</script>
+</body>
+</html>
