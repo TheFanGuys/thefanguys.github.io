@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>Fan Guys — Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a0b;
+      --surface:   #141517;
+      --surface2:  #1c1d20;
+      --border:    rgba(255,255,255,0.08);
+      --border-hi: rgba(255,255,255,0.16);
+      --silver:    #a8b0be;
+      --silver-lo: #525a68;
+      --silver-hi: #d8dde8;
+      --white:     #eef0f4;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--white);
+      font-family: "Barlow", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px calc(env(safe-area-inset-bottom, 0px) + 40px);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* ── Status bar ── */
+    .status {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 2px 0;
+      height: 50px;
+    }
+    .status-time {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      color: var(--silver);
+    }
+    .status-icons { display: flex; gap: 5px; align-items: center; color: var(--silver); }
+
+    /* ── Hero ── */
+    .hero {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 0 32px;
+      gap: 0;
+      opacity: 0;
+      animation: fadeUp .5s ease .1s forwards;
+    }
+
+    /* ── Fan ── */
+    .fan-wrap {
+      width: 160px;
+      height: 160px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 0 30px rgba(160,180,210,0.22)) drop-shadow(0 6px 20px rgba(0,0,0,0.9));
+    }
+
+    .fan-svg {
+      width: 160px;
+      height: 160px;
+      display: block;
+      overflow: visible;
+    }
+
+    /* ── Wordmark ── */
+    .wordmark {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .wordmark-title {
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: clamp(52px, 14vw, 72px);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1;
+      /* metallic silver gradient */
+      background: linear-gradient(175deg,
+        #ffffff 0%,
+        #e2e6ee 20%,
+        #b0b8c8 45%,
+        #c8cdd8 65%,
+        #eaedf3 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .wordmark-sub {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--silver-lo);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.1) 80%, transparent);
+      margin: 0 0 26px;
+      opacity: 0;
+      animation: fadeIn .4s ease .5s forwards;
+    }
+
+    /* ── Section label ── */
+    .section-lbl {
+      width: 100%;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--silver-lo);
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeIn .4s ease .55s forwards;
+    }
+
+    /* ── Cards ── */
+    .cards {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 20px 20px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      -webkit-tap-highlight-color: transparent;
+      transition:
+        background-color 160ms ease,
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        transform 160ms ease;
+      background-image: linear-gradient(180deg, rgba(255,255,255,0.028) 0%, transparent 55%);
+    }
+
+    .card:nth-child(1) { animation: slideUp .4s ease .62s forwards; }
+    .card:nth-child(2) { animation: slideUp .4s ease .70s forwards; }
+    .card:nth-child(3) { animation: slideUp .4s ease .78s forwards; }
+    .card:nth-child(4) { animation: slideUp .4s ease .86s forwards; }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      left: 0; top: 18%; bottom: 18%;
+      width: 2.5px;
+      border-radius: 0 2px 2px 0;
+      background: linear-gradient(180deg, var(--silver-hi), var(--silver-lo));
+      opacity: 0;
+      transition: opacity 160ms ease;
+    }
+
+    .card:hover  { background-color: var(--surface2); border-color: var(--border-hi); box-shadow: 0 6px 28px rgba(0,0,0,.55); transform: translateY(-1px); }
+    .card:active { background-color: var(--surface2); border-color: var(--border-hi); transform: scale(.975); }
+    .card:hover::after, .card:active::after { opacity: 1; }
+
+    .card-icon {
+      width: 42px; height: 42px;
+      border-radius: 11px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.09);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-icon svg { color: var(--silver); width: 19px; height: 19px; }
+
+    .card-text { flex: 1; min-width: 0; }
+
+    .card-title {
+      font-family: "Barlow Condensed", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .card-sub {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--silver-lo);
+      margin-top: 4px;
+    }
+
+    .card-arrow {
+      flex-shrink: 0;
+      color: var(--silver-lo);
+      transition: transform 160ms ease, color 160ms ease;
+    }
+    .card:hover .card-arrow, .card:active .card-arrow {
+      color: var(--silver-hi);
+      transform: translateX(3px);
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 48px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--silver-lo);
+      opacity: 0;
+      animation: fadeIn .5s ease 1.1s forwards;
+    }
+
+    @keyframes fadeUp  { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:none; } }
+    @keyframes fadeIn  { to { opacity: 1; } }
+    @keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Status bar -->
+  <div class="status" aria-hidden="true">
+    <span class="status-time" id="js-time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0"    y="7"   width="3" height="5"  rx=".7" fill="currentColor" opacity=".35"/>
+        <rect x="4.5"  y="5"   width="3" height="7"  rx=".7" fill="currentColor" opacity=".6"/>
+        <rect x="9"    y="2.5" width="3" height="9.5" rx=".7" fill="currentColor" opacity=".8"/>
+        <rect x="13.5" y="0"   width="3" height="12" rx=".7" fill="currentColor"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <circle cx="8" cy="10.5" r="1.3" fill="currentColor"/>
+        <path d="M3.8 6.5a6 6 0 0 1 8.4 0"  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+        <path d="M1   3.5a11 11 0 0 1 14 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+      </svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x=".5" y=".5" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1" opacity=".45"/>
+        <rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="currentColor" opacity=".35"/>
+        <rect x="2" y="2" width="15" height="8" rx="1.5" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <header class="hero">
+
+    <!-- Fan — only #fan-rotor moves -->
+    <div class="fan-wrap" aria-hidden="true">
+      <svg class="fan-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Blade gradients — alternating light/dark for 3D feel -->
+          <linearGradient id="fg1" x1="20%" y1="0%" x2="80%" y2="100%">
+            <stop offset="0%"   stop-color="#f4f6fa"/>
+            <stop offset="40%"  stop-color="#c0c8d4"/>
+            <stop offset="100%" stop-color="#707888"/>
+          </linearGradient>
+          <linearGradient id="fg2" x1="80%" y1="0%" x2="20%" y2="100%">
+            <stop offset="0%"   stop-color="#dde2ea"/>
+            <stop offset="45%"  stop-color="#98a0ae"/>
+            <stop offset="100%" stop-color="#585e6a"/>
+          </linearGradient>
+          <!-- Hub -->
+          <radialGradient id="hg" cx="36%" cy="30%" r="70%">
+            <stop offset="0%"   stop-color="#e8ecf4"/>
+            <stop offset="50%"  stop-color="#8890a0"/>
+            <stop offset="100%" stop-color="#282c38"/>
+          </radialGradient>
+          <filter id="bshadow" x="-15%" y="-15%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#000" flood-opacity=".65"/>
+          </filter>
+          <filter id="hshadow" x="-80%" y="-80%" width="260%" height="260%">
+            <feDropShadow dx="1" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity=".75"/>
+          </filter>
+        </defs>
+
+        <!-- Single rotating group — JS sets transform="rotate(A 50 50)" here -->
+        <g id="fan-rotor">
+          <!-- 5 blades: same path shape, each rotated 72° around center -->
+          <g filter="url(#bshadow)">
+            <!-- The blade shape: root at center, sweeps up then curves right, wide tip -->
+            <path transform="rotate(0   50 50)" d="M50,50 C45,47 40,33 42,16 C43,6 52,2 57,8 C62,14 60,30 58,42 C57,47 54,50 50,50Z" fill="url(#fg1)"/>
+            <path transform="rotate(72  50 50)" d="M50,50 C45,47 40,33 42,16 C43,6 52,2 57,8 C62,14 60,30 58,42 C57,47 54,50 50,50Z" fill="url(#fg2)"/>
+            <path transform="rotate(144 50 50)" d="M50,50 C45,47 40,33 42,16 C43,6 52,2 57,8 C62,14 60,30 58,42 C57,47 54,50 50,50Z" fill="url(#fg1)"/>
+            <path transform="rotate(216 50 50)" d="M50,50 C45,47 40,33 42,16 C43,6 52,2 57,8 C62,14 60,30 58,42 C57,47 54,50 50,50Z" fill="url(#fg2)"/>
+            <path transform="rotate(288 50 50)" d="M50,50 C45,47 40,33 42,16 C43,6 52,2 57,8 C62,14 60,30 58,42 C57,47 54,50 50,50Z" fill="url(#fg1)"/>
+          </g>
+          <!-- Hub cap -->
+          <circle cx="50" cy="50" r="10" fill="url(#hg)" filter="url(#hshadow)"/>
+          <circle cx="50" cy="50" r="10" fill="none" stroke="rgba(255,255,255,.12)" stroke-width=".8"/>
+          <circle cx="50" cy="50" r="4.2" fill="#0e0f12"/>
+          <ellipse cx="47.5" cy="47" rx="2" ry="1.2" fill="rgba(255,255,255,.28)" transform="rotate(-28 47.5 47)"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Text wordmark -->
+    <div class="wordmark">
+      <span class="wordmark-title">Fan Guys</span>
+      <span class="wordmark-sub">Internal Tools</span>
+    </div>
+
+  </header>
+
+  <div class="divider"></div>
+  <p class="section-lbl">Applications</p>
+
+  <nav class="cards">
+
+    <a class="card" href="https://thefanguys.github.io/Estimator/" target="_blank" rel="noopener">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </div>
+      <div class="card-text">
+        <div class="card-title">The Estimator</div>
+        <div class="card-sub">Job costing &amp; quotes</div>
+      </div>
+      <div class="card-arrow">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+
+    <a class="card" href="https://thefanguys.github.io/Site-Survey/" target="_blank" rel="noopener">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <div class="card-text">
+        <div class="card-title">Site Survey</div>
+        <div class="card-sub">Field data capture</div>
+      </div>
+      <div class="card-arrow">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+
+    <a class="card" href="https://thefanguys.github.io/Job-Materials-/" target="_blank" rel="noopener">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+          <rect x="9" y="3" width="6" height="4" rx="1"/>
+          <path d="M9 12h6M9 16h4"/>
+        </svg>
+      </div>
+      <div class="card-text">
+        <div class="card-title">Material List</div>
+        <div class="card-sub">Parts &amp; materials</div>
+      </div>
+      <div class="card-arrow">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+
+    <a class="card" href="https://thefanguys.github.io/tech-pro/" target="_blank" rel="noopener">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+      </div>
+      <div class="card-text">
+        <div class="card-title">Tech Pro Field Service</div>
+        <div class="card-sub">Technician workflow</div>
+      </div>
+      <div class="card-arrow">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+
+  </nav>
+
+  <footer class="footer">Fan Guys &nbsp;&middot;&nbsp; Internal Tools Portal</footer>
+
+</div>
+
+<script>
+// Clock
+(function() {
+  function tick() {
+    var el = document.getElementById("js-time");
+    if (!el) return;
+    var d = new Date();
+    el.textContent = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
+  }
+  tick();
+  setInterval(tick, 15000);
+})();
+
+// Fan — rAF driven, touch anywhere except cards to boost
+(function() {
+  var rotor = document.getElementById("fan-rotor");
+  if (!rotor) return;
+
+  var angle   = 0;
+  var speed   = 80;       // deg/sec idle
+  var target  = 80;
+  var MAX     = 2400;     // deg/sec max
+  var IDLE    = 80;
+  var decayTimer = null;
+
+  function boost() {
+    speed = Math.min(speed + 500, MAX);
+    target = speed;
+    clearTimeout(decayTimer);
+    decayTimer = setTimeout(function() {
+      target = IDLE;
+    }, 2500);
+  }
+
+  // Listen on document — ignore taps that land on .card
+  function onInteract(e) {
+    var el = e.target;
+    while (el) {
+      if (el.classList && el.classList.contains("card")) return;
+      el = el.parentElement;
+    }
+    boost();
+  }
+
+  document.addEventListener("click",      onInteract);
+  document.addEventListener("touchstart", onInteract, { passive: true });
+
+  var last = null;
+  function frame(ts) {
+    if (last !== null) {
+      var dt = Math.min(ts - last, 50) / 1000;
+      // ease speed toward target
+      speed += (target - speed) * Math.min(dt * 3, 1);
+      angle  = (angle + speed * dt) % 360;
+      rotor.setAttribute("transform", "rotate(" + angle.toFixed(2) + " 50 50)");
+    }
+    last = ts;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
