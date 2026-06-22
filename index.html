@@ -561,11 +561,10 @@ var pendingHref = null;
 var modalShown = false;
 
 function showInstall(e, el) {
-  // Only show once per session
-  if (modalShown) return;
-  // Check if already installed as PWA
-  if (window.navigator.standalone) return;
+  // Skip if already installed as PWA or already shown
+  if (modalShown || window.navigator.standalone) return;
   e.preventDefault();
+  e.stopPropagation();
   pendingHref = el.href;
   document.getElementById("modal").classList.add("open");
 }
@@ -578,10 +577,20 @@ function closeModal(e) {
 
 function closeModalBtn() {
   modalShown = true;
+  var href = pendingHref;
+  pendingHref = null;
   document.getElementById("modal").classList.remove("open");
-  if (pendingHref) {
-    window.open(pendingHref, "_blank");
-    pendingHref = null;
+  // Small delay lets the modal animate out before navigation
+  // Using location assign on same-origin or anchor tag click trick
+  // to avoid Safari popup blocker (which blocks window.open in async callbacks)
+  if (href) {
+    var a = document.createElement("a");
+    a.href = href;
+    a.target = "_blank";
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 }
 </script>
