@@ -449,75 +449,7 @@
     </a>
   </nav>
 
-  <!-- Password protected section -->
-  <p class="section-lbl gap">Extras &nbsp;<span style="opacity:.4;font-size:8px;">&#x1F512;</span></p>
-
-  <!-- Locked state -->
-  <div id="lock-wall" style="width:100%;">
-    <div style="
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
-    ">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#525a68" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-      <div style="display:flex;gap:8px;align-items:center;width:100%;">
-        <input id="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="Enter PIN"
-          style="
-            flex:1;
-            background: #0e0f12;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 13px 14px;
-            color: #eef0f4;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 18px;
-            letter-spacing: 0.3em;
-            text-align: center;
-            outline: none;
-            -webkit-appearance: none;
-          "
-        />
-        <button onclick="checkPin()" style="
-          background: rgba(255,255,255,0.07);
-          border: 1px solid rgba(255,255,255,0.12);
-          border-radius: 10px;
-          padding: 13px 18px;
-          color: #a8b0be;
-          font-family: 'Barlow Condensed', sans-serif;
-          font-size: 15px;
-          font-weight: 700;
-          letter-spacing: .06em;
-          text-transform: uppercase;
-          cursor: pointer;
-          -webkit-tap-highlight-color: transparent;
-        ">Unlock</button>
-      </div>
-      <div id="pin-error" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:#e05555;display:none;">Incorrect PIN</div>
-    </div>
-  </div>
-
-  <!-- Unlocked apps — hidden until correct PIN -->
-  <div id="finance-apps" style="width:100%;display:none;">
-    <div class="cards">
-      <a class="btn" href="https://thefanguys.github.io/Invoice-Pro/" target="_blank" rel="noopener">
-        <div class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h6M9 17h4"/></svg></div>
-        <div class="btn-text"><div class="btn-title">Invoice Pro</div><div class="btn-sub">Invoicing &amp; billing</div></div>
-        <div class="btn-arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-      </a>
-      <a class="btn" href="https://thefanguys.github.io/Ledgerpro-/" target="_blank" rel="noopener">
-        <div class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
-        <div class="btn-text"><div class="btn-title">Ledger Pro</div><div class="btn-sub">Accounting &amp; books</div></div>
-        <div class="btn-arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-      </a>
-    </div>
-  </div>
+</div>
 
   <footer class="footer">Fan Guys &nbsp;&middot;&nbsp; Internal Tools Portal</footer>
 </div>
