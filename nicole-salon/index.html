@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nicole's Salon Dream Setup</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f1e9;--card:#fffdf9;--ink:#3b332c;--muted:#8a7d70;--sage:#7d8f72;--sage-l:#e7ecdf;--clay:#c07a55;--line:#e6ddd0;--r:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font:16px/1.5 "Nunito Sans",system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 120px}
+h1,h2,.serif{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600}
+h1{font-size:34px;line-height:1.1;margin:10px 0}
+h2{font-size:28px;line-height:1.15;margin:4px 0 6px}
+.lead{color:var(--muted)}
+.prog{position:sticky;top:0;background:var(--bg);padding:12px 0 10px;z-index:3}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--sage);width:0;transition:width .3s}
+.prog .meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
+.q{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:14px 0}
+.q .t{font-weight:700;margin-bottom:2px}
+.q .h{font-size:13px;color:var(--muted);margin-bottom:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font:inherit;font-size:15px;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:8px}
+.chip.on{background:var(--sage-l);border-color:var(--sage);color:#2f3a29;font-weight:700}
+.chip.ai{border-style:dashed}
+.chip .sw{width:16px;height:16px;border-radius:50%;border:1px solid #0002}
+.vibes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vibe{border:2px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;cursor:pointer;text-align:left;font:inherit;color:var(--ink);padding:0}
+.vibe.on{border-color:var(--sage);box-shadow:0 0 0 3px var(--sage-l)}
+.vibe .pal{display:flex;height:46px}.vibe .pal span{flex:1}
+.vibe b{display:block;padding:8px 10px 0;font-size:14px}
+.vibe small{display:block;padding:0 10px 10px;color:var(--muted);font-size:12px}
+input[type=text],textarea,input[type=number]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px;font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:84px;resize:vertical}
+.other{margin-top:10px;display:none}.other.on{display:block}
+.nav{position:fixed;left:0;right:0;bottom:0;background:#f6f1e9f2;border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));backdrop-filter:blur(6px)}
+.nav .in{max-width:640px;margin:0 auto;display:flex;gap:10px}
+button.b{border:0;border-radius:12px;padding:14px 18px;font:700 16px "Nunito Sans",sans-serif;cursor:pointer}
+.b.pri{background:var(--sage);color:#fff;flex:1}
+.b.sec{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.b.clay{background:var(--clay);color:#fff}
+.note{background:var(--sage-l);border-radius:12px;padding:12px 14px;font-size:14px;margin:12px 0}
+.warn{background:#f7e6dc;border-radius:12px;padding:12px 14px;font-size:14px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:4px}
+td{padding:4px;vertical-align:top}
+td input{padding:8px;border-radius:8px;font-size:14px}
+.x{background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;padding:6px}
+.saved{font-size:12px;color:var(--muted)}
+.sec-list button{display:flex;justify-content:space-between;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:6px 0;font:inherit;color:var(--ink);cursor:pointer}
+.ok{color:var(--sage);font-weight:700}
+pre{white-space:pre-wrap;font:13px/1.45 ui-monospace,monospace;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;max-height:340px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="prog" id="prog" style="display:none"><div class="bar"><i id="barFill"></i></div><div class="meta"><span id="secName"></span><span class="saved" id="saved"></span></div></div>
+  <div id="screen"></div>
+</div>
+<div class="nav" id="nav" style="display:none"><div class="in"><button class="b sec" id="back">Back</button><button class="b pri" id="next">Next</button></div></div>
+
+<script>
+// ===== Question bank =====
+// Every single/multi question automatically gets "You decide for me" and "Other…" (type your own).
+const S = [
+{ id:"about", title:"You & your business", intro:"The basics, so the site sounds like you.", qs:[
+  {id:"biz_name",t:"Business name",type:"text",ph:"Holistic Hair Design",def:"Holistic Hair Design"},
+  {id:"tagline_feel",t:"What feeling should people get from your brand?",type:"single",o:["Calm & healing","Natural beauty","Luxury self-care","Clean, non-toxic hair","Faith-centered hospitality","Fun & bold"]},
+  {id:"holistic_means",t:"What does \"holistic\" mean in your chair?",h:"Pick all that apply.",type:"multi",o:["Non-toxic / clean products","Scalp health focus","Gentle for sensitive clients","Low-chemical or natural color options","Whole-person, relaxing experience","Natural & curly hair expertise","Faith-based kindness","Healthy hair over trends"]},
+  {id:"specialties",t:"Which services do you want to be known for?",type:"multi",o:["Cuts","All-over color","Balayage / highlights","Natural or organic color","Henna","Gray blending","Curly cuts","Scalp treatments","Blowouts & styling","Bridal & events","Extensions","Men's cuts","Kids' cuts"]},
+  {id:"years",t:"How many years have you been doing hair?",type:"single",o:["0–3","4–7","8–15","15+"]},
+  {id:"setting",t:"Where do you work?",type:"single",o:["My own suite","Rented chair in a salon","Home studio","Mobile — I travel to clients","A mix"]},
+  {id:"location_now",t:"Current address or area to show (city is fine)",type:"text",ph:"e.g. Prescott, AZ"},
+  {id:"move_show",t:"With a possible St. George move, what should the site show?",type:"single",o:["Prescott now, switch later","Both locations","Prescott + \"St. George coming soon\"","City only, no address"]},
+]},
+{ id:"services", title:"Services & prices", intro:"GlossGenius doesn't let you export services, so let's skip the typing.", special:"services", qs:[
+  {id:"price_display",t:"How should prices show on your site?",type:"single",o:["Exact prices","\"Starting at\" prices","Price ranges","Hide prices — consult first"]},
+  {id:"consults",t:"Consultations",type:"single",o:["Free consult required for new color clients","Free consult, optional","Paid consult (credited to service)","No consults"]},
+  {id:"addons",t:"Add-ons you offer or want to offer",type:"multi",o:["Deep conditioning","Scalp massage","Gloss / toner","Olaplex or bond treatment","Blowout add-on","Brow wax","Bang trim between visits"]},
+]},
+{ id:"booking", title:"Booking rules", intro:"How clients can (and can't) book you.", qs:[
+  {id:"new_clients",t:"New clients should…",type:"single",o:["Book online like anyone","Request — I approve each one","Book a consult first","I'm not taking new clients"]},
+  {id:"lead_time",t:"Shortest notice for a booking",type:"single",o:["Same day is fine","At least 12 hours","24 hours","48 hours"]},
+  {id:"advance",t:"How far ahead can clients book?",type:"single",o:["2 weeks","1 month","2 months","3+ months"]},
+  {id:"buffer",t:"Break between clients",type:"single",o:["None","10 min","15 min","30 min"]},
+  {id:"hours",t:"Your usual working days & hours",type:"text",ph:"e.g. Tue–Fri 9–5, Sat 9–2"},
+  {id:"hours_pattern",t:"Do your hours stay the same?",type:"single",o:["Same every week","Changes week to week","I block time as I go"]},
+  {id:"travel_block",t:"Do you need an easy way to block off weeks when you travel with Chris?",type:"single",o:["Yes, definitely","Sometimes","No"]},
+  {id:"processing",t:"While color processes, book a quick service in between?",type:"single",o:["Yes","No","Only trims / small services"]},
+]},
+{ id:"policies", title:"Deposits & policies", intro:"Protects your time without scaring off good clients.", qs:[
+  {id:"deposit_who",t:"Who pays a deposit?",type:"single",o:["Nobody","New clients only","Long services only (color, extensions)","Everyone"]},
+  {id:"deposit_amt",t:"Deposit amount",type:"single",o:["$25","$50","20% of service","50% of service"]},
+  {id:"cancel_window",t:"Cancellation notice required",type:"single",o:["24 hours","48 hours","72 hours"]},
+  {id:"cancel_fee",t:"Late cancellation",type:"single",o:["Keep the deposit","Charge 50%","Charge 100%","One warning, then a fee","No fee"]},
+  {id:"noshow",t:"No-show",type:"single",o:["Keep the deposit","Charge 50%","Charge 100%","No fee"]},
+  {id:"late",t:"Client running late",type:"single",o:["10-minute grace","15-minute grace","Shorten the service","Reschedule after 15 min"]},
+  {id:"card_file",t:"Card on file to book?",type:"single",o:["Required for everyone","New clients only","Not required"]},
+]},
+{ id:"payments", title:"Payments & checkout", intro:"Square handles all the card info securely — we never see card numbers.", qs:[
+  {id:"tips",t:"Tipping",type:"single",o:["Tip buttons: 18 / 20 / 25%","Tip buttons: 15 / 20 / 25%","Custom amount only","No tipping"]},
+  {id:"pay_methods",t:"Ways clients can pay",type:"multi",o:["Tap / chip card in person","Pay online ahead","Apple Pay / Google Pay","Cash","Gift cards"],h:"Note: Square doesn't take Venmo or Zelle directly — if you use those, add them under Other."},
+  {id:"hardware",t:"How do you want to take cards in person?",type:"single",o:["Tap to Pay on my iPhone (no reader)","A small Square card reader","Square countertop terminal","I already have a reader"]},
+  {id:"retail",t:"Sell products?",type:"single",o:["Yes, in person","Yes, online too","Maybe later","No"]},
+  {id:"retail_brands",t:"Product lines you use or love",type:"text",ph:"e.g. Oway, Innersense, Rahua…"},
+  {id:"packages",t:"Packages or memberships?",type:"single",o:["Yes — e.g. monthly blowout membership","Prepaid packages","Maybe later","No"]},
+  {id:"card_fee",t:"Card processing fees (about 2.6–3.3%)",type:"single",o:["I'll absorb them (built into prices)","Raise prices slightly to cover","Discount for cash"],h:"Adding a separate surcharge has rules that vary by state, so we'd check before doing that."},
+]},
+{ id:"clients", title:"Client experience", intro:"The little touches that make clients feel cared for.", qs:[
+  {id:"reminders",t:"Reminders",type:"multi",o:["Email confirmation when booked","Text 2 days before","Text the day before","Text 2 hours before"]},
+  {id:"intake",t:"What should new clients tell you before their first visit?",type:"multi",o:["Allergies & sensitivities","Hair history (color, chemicals)","Products used at home","Scalp or health concerns","Goals + inspiration photos","How they heard about me"]},
+  {id:"rebook",t:"Rebooking",type:"single",o:["Auto text when it's time to rebook","I ask at checkout","Both","No"]},
+  {id:"aftercare",t:"Send aftercare tips after a visit?",type:"single",o:["Yes, automatically","Only for color / chemical services","No"]},
+  {id:"reviews",t:"Ask for reviews",type:"single",o:["Auto-ask for a Google review after visits","I'll ask in person","No"]},
+  {id:"birthday",t:"Birthday message or treat?",type:"single",o:["Yes, with a small discount","Yes, just a note","No"]},
+]},
+{ id:"look", title:"Website look & vibe", intro:"Pick what feels like you. Nothing is locked — we'll show you a preview first.", special:"vibe", qs:[
+  {id:"colors",t:"Colors you love",type:"multi",swatch:true,o:[["Sage","#9caf88"],["Olive","#6b7046"],["Cream","#f3ead8"],["Blush","#e8c4bd"],["Terracotta","#c07a55"],["Gold","#c9a45c"],["Deep green","#2f4a3a"],["Lavender","#b8a9c9"],["Dusty blue","#8fa5b5"],["Warm brown","#7a5a43"],["Black","#1f1d1b"],["White","#ffffff"]]},
+  {id:"colors_no",t:"Any colors you DON'T want?",type:"text",ph:"e.g. no pink, no black"},
+  {id:"fonts",t:"Lettering style",type:"single",o:["Elegant serif (like a magazine)","Clean & modern","Handwritten accents","Serif headings + clean text"]},
+  {id:"photos",t:"Photos on the site",type:"multi",o:["My hair work (before & afters)","My salon space","Photos of me","Nature / botanical images","Product shots"]},
+  {id:"pages",t:"Pages you want",type:"multi",o:["Home","Services & prices","Book now","About me","Gallery","Reviews","FAQ","Products I use","Policies","Contact","Hair tips / blog","Gift cards"]},
+  {id:"three_words",t:"Three words a client should use to describe your site",type:"text",ph:"e.g. peaceful, fresh, trustworthy"},
+  {id:"sites_like",t:"Websites or Instagram pages you love the look of",type:"text",ph:"Paste links or names"},
+  {id:"sites_dislike",t:"Anything you've seen and hated?",type:"text"},
+  {id:"logo",t:"Logo",type:"single",o:["I have one I love","I have one, want a refresh","I need a new one"]},
+  {id:"faith",t:"Faith on the site",type:"single",o:["Share it openly (e.g. a verse)","Subtle touch","Keep it off the site"]},
+  {id:"domain",t:"Web address",type:"single",o:["I have one (type it under Other)","I need one","Not sure"]},
+]},
+{ id:"story", title:"Your story & words", intro:"Short answers are perfect — we'll polish them.", qs:[
+  {id:"why_started",t:"Why did you get into hair, and why holistic?",type:"textarea"},
+  {id:"client_says",t:"What do clients usually say after an appointment?",type:"textarea"},
+  {id:"feel",t:"How do you want people to feel when they leave?",type:"textarea"},
+  {id:"tone",t:"Writing tone",type:"single",o:["Warm & personal","Calm & spiritual","Polished & professional","Playful & friendly"]},
+  {id:"testimonials",t:"Reviews for the site",type:"multi",o:["Screenshots of my GlossGenius reviews","My Google reviews","I'll send some","None yet"]},
+]},
+{ id:"marketing", title:"Marketing & getting found", intro:"So the right clients can find you on Google and Instagram.", qs:[
+  {id:"ideal",t:"Your ideal clients",type:"multi",o:["Women 25–45","Busy moms","Chemical-sensitive / non-toxic seekers","Curly & natural hair","Brides","Gray blending / going gray","Wellness-minded people","Men"]},
+  {id:"areas",t:"Towns or areas you want clients from",type:"text",ph:"e.g. Prescott, Prescott Valley, Chino Valley, Dewey"},
+  {id:"search_terms",t:"What would your dream client type into Google?",type:"multi",o:["non-toxic hair salon near me","organic hair color","holistic hair salon","clean beauty salon","curly hair stylist","balayage near me","ammonia-free color"]},
+  {id:"gbp",t:"Google Business Profile (shows you on Google Maps)",type:"single",o:["I have one","I don't","Not sure"]},
+  {id:"email_mkt",t:"Email / text marketing",type:"single",o:["Monthly newsletter","Occasional specials only","Just reminders, no marketing","None"]},
+  {id:"referral",t:"Referral reward",type:"single",o:["$ off for both people","Free add-on for both","None"]},
+  {id:"new_offer",t:"New client offer",type:"single",o:["Discount on first visit","Free add-on first visit","No special offer"]},
+  {id:"mkt_time",t:"Time you're willing to spend on marketing",type:"single",o:["None — automate it","About 30 min a week","1–2 hours a week"]},
+]},
+{ id:"social", title:"Social media", intro:"Your accounts, how you use them, and how much help you want.", qs:[
+  {id:"platforms",t:"Which do you have now?",type:"multi",o:["Instagram","Facebook page","TikTok","Pinterest","YouTube","Google Business Profile","Nextdoor","None yet"]},
+  {id:"handle_ig",t:"Instagram handle",type:"text",ph:"@…"},
+  {id:"handle_fb",t:"Facebook page name or link",type:"text"},
+  {id:"handle_other",t:"Other handles (TikTok, Pinterest, etc.)",type:"text"},
+  {id:"social_active",t:"Which one do you actually use the most?",type:"single",o:["Instagram","Facebook","TikTok","I don't really post"]},
+  {id:"social_new",t:"Any accounts you want to start?",type:"multi",o:["Instagram","Facebook page","TikTok","Pinterest","Google Business Profile","None"]},
+  {id:"social_goal",t:"What should social media do for you?",type:"multi",o:["Bring in new clients","Show off my work","Fill last-minute openings","Share hair-health tips","Build trust / show my personality","Sell products"]},
+  {id:"post_freq",t:"How often can you realistically post?",type:"single",o:["Daily","2–3 times a week","Once a week","A few times a month","Rarely"]},
+  {id:"content",t:"What would you post?",type:"multi",o:["Before & afters","Short videos / Reels","Hair tips & education","Product favorites","Behind the scenes","Client reviews","Openings & specials","Faith / encouragement"]},
+  {id:"on_camera",t:"Comfortable on camera?",type:"single",o:["Yes, love it","Voice-over only","Hands & hair only","Prefer photos"]},
+  {id:"social_help",t:"What help do you want?",type:"multi",o:["Write captions for me","Monthly content plan","Hashtags & local tags","Reminders to post","Design post templates","Clean up my bio & profile"]},
+  {id:"social_link",t:"Connect booking to social",type:"multi",o:["\"Book\" button on Instagram","Booking link in bio","Facebook \"Book Now\" button","Instagram feed shown on my website"],h:"Square's free plan advertises Instagram booking; we'll confirm each one works when we set it up."},
+  {id:"social_logins",t:"Account logins",type:"single",o:["I'll keep my own logins","I'll add Chris as a page admin"],h:"Never type passwords into this form."},
+]},
+{ id:"books", title:"Money & bookkeeping", intro:"What you'd like to see without doing extra work.", qs:[
+  {id:"see",t:"What would you like to see each month?",type:"multi",o:["Income","Tips","Expenses by category","Profit","Money to set aside for taxes","Product inventory","Mileage","Best-selling services","Clients who haven't been back"]},
+  {id:"expenses",t:"Expense types you have",type:"multi",o:["Color & products","Suite or chair rent","Tools","Education / classes","License & insurance","Software / apps","Marketing","Mileage","Laundry & supplies"]},
+  {id:"receipts",t:"How do you keep receipts now?",type:"single",o:["Phone photos","Paper","Bank / card statement only","I don't really"]},
+  {id:"tax_setaside",t:"Set aside for taxes",type:"single",o:["20%","25%","30%","Whatever our tax preparer says"]},
+  {id:"report_freq",t:"How often do you want a money summary?",type:"single",o:["Weekly","Monthly","Quarterly"]},
+]},
+{ id:"switch", title:"Moving off GlossGenius", intro:"So nothing (and no client) gets lost.", special:"gg", qs:[
+  {id:"gg_love",t:"What do you like about GlossGenius?",type:"multi",o:["Booking site","Reminders","Payments","Marketing texts","Reports","Easy app","Client notes"]},
+  {id:"gg_hate",t:"What bugs you about it?",type:"multi",o:["Monthly price","Fees","Can't customize the look","Hard to use","Missing features","Nothing really"]},
+  {id:"must_keep",t:"Anything you absolutely can't lose?",type:"text"},
+  {id:"client_count",t:"About how many clients are in it?",type:"single",o:["Under 50","50–150","150–300","300+"]},
+  {id:"export",t:"Client list export",type:"single",o:["I'll export it myself","Chris can help me","Not yet"]},
+  {id:"timing",t:"When should we switch?",type:"single",o:["As soon as it's ready","After the holidays","During a slow week","When we move"]},
+  {id:"notify",t:"How should we tell clients about the new booking link?",type:"multi",o:["Text","Email","Instagram post","Tell them in person"]},
+]},
+{ id:"priorities", title:"What matters most", intro:"Last one!", qs:[
+  {id:"top3",t:"Pick your top 3",type:"multi",max:3,o:["Beautiful site","Easy booking","Fewer no-shows","More new clients","Less admin work","Better money tracking","Lower monthly costs","Selling products"]},
+  {id:"budget",t:"Monthly budget for tools (beyond card fees)",type:"single",o:["$0 if possible","Up to $25","Up to $50","Whatever works best"]},
+  {id:"deadline",t:"Any date you'd love this done by?",type:"text"},
+  {id:"anything",t:"Anything else Chris and Claude should know?",type:"textarea"},
+]},
+];
+const VIBES=[
+ {k:"Earthy & natural",d:"Sage, clay, linen",c:["#9caf88","#c07a55","#efe6d6","#5b5040"]},
+ {k:"Soft & airy",d:"Cream, blush, lots of white space",c:["#fbf7f2","#e8c4bd","#d9cfc4","#8a7d70"]},
+ {k:"Luxe minimal",d:"Black, gold, elegant serif",c:["#1f1d1b","#c9a45c","#f5f1ea","#6d6458"]},
+ {k:"Boho warm",d:"Terracotta, rattan, sunlight",c:["#c07a55","#e2b877","#f3e6d3","#6b4a35"]},
+ {k:"Modern clean",d:"White with one bold color",c:["#ffffff","#2f4a3a","#eeeeea","#8a8f87"]},
+ {k:"Moody botanical",d:"Deep green, warm wood",c:["#2f4a3a","#7a5a43","#d8cdb8","#1f2a24"]}
+];
+const AI="You decide for me", OTHER="Other…";
+
+// ===== State =====
+let A = {}, services = [], step = -1, submitted=false, db=null, sample=null, canSave=false;
+try{ const l=JSON.parse(localStorage.getItem("nq_v1")||"null"); if(l){A=l.A||{};services=l.services||[];} }catch(_){}
+S.forEach(s=>s.qs.forEach(q=>{ if(q.def && A[q.id]==null) A[q.id]=q.def; }));
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+let saveTimer=null;
+function queueSave(){
+  try{ localStorage.setItem("nq_v1",JSON.stringify({A,services})); }catch(_){}
+  $("#saved").textContent="Saving…"; clearTimeout(saveTimer); saveTimer=setTimeout(saveNow,1500);
+}
+let saving=false, again=false;
+async function saveNow(){
+  if(!db||!canSave){ $("#saved").textContent="Saved on this device"; return; }
+  if(saving){again=true;return;} saving=true;
+  try{ await db.doc("questionnaires/nicole").set({answers:A,services,submitted,updatedAt:new Date().toISOString()}); $("#saved").textContent="Saved ✓"; }
+  catch(e){ canSave=false; $("#saved").textContent="Saved on this device"; }
+  saving=false; if(again){again=false;saveNow();}
+}
+
+// ===== Rendering =====
+function optLabel(o){ return Array.isArray(o)?o[0]:o; }
+function qHTML(q){
+  const v=A[q.id];
+  if(q.type==="text") return `<div class="q"><div class="t">${esc(q.t)}</div>${q.h?`<div class="h">${esc(q.h)}</div>`:""}<input type="text" data-q="${q.id}" value="${esc(v||"")}" placeholder="${esc(q.ph||"")}"></div>`;
+  if(q.type==="textarea") return `<div class="q"><div class="t">${esc(q.t)}</div><div class="h">${q.h?esc(q.h)+" ":""}Tip: tap the 🎤 on your keyboard to talk instead of type.</div><textarea data-q="${q.id}" placeholder="${esc(q.ph||"")}">${esc(v||"")}</textarea></div>`;
+  const sel = q.type==="multi" ? (Array.isArray(v?.sel)?v.sel:[]) : (v?.sel?[v.sel]:[]);
+  const opts=[...q.o, AI, OTHER];
+  return `<div class="q"><div class="t">${esc(q.t)}</div><div class="h">${q.h?esc(q.h)+" ":""}${q.type==="multi"?(q.max?`Pick up to ${q.max}.`:"Pick as many as you like."):"Pick one."}</div>
+   <div class="chips">${opts.map(o=>{const L=optLabel(o);const sw=Array.isArray(o)?`<span class="sw" style="background:${o[1]}"></span>`:"";
+     return `<button class="chip ${sel.includes(L)?"on":""} ${L===AI?"ai":""}" data-chip="${q.id}" data-val="${esc(L)}">${sw}${esc(L)}</button>`;}).join("")}</div>
+   <div class="other ${sel.includes(OTHER)?"on":""}" id="oth-${q.id}"><input type="text" data-other="${q.id}" placeholder="Type your own…" value="${esc(v?.other||"")}"></div></div>`;
+}
+function vibeHTML(){
+  const v=A.vibe?.sel;
+  return `<div class="q"><div class="t">Overall vibe</div><div class="h">Pick one — or "You decide".</div><div class="vibes">${VIBES.map(x=>`<button class="vibe ${v===x.k?"on":""}" data-vibe="${esc(x.k)}"><div class="pal">${x.c.map(c=>`<span style="background:${c}"></span>`).join("")}</div><b>${esc(x.k)}</b><small>${esc(x.d)}</small></button>`).join("")}</div>
+  <div class="chips" style="margin-top:10px"><button class="chip ai ${v===AI?"on":""}" data-vibe="${AI}">${AI}</button><button class="chip ${v===OTHER?"on":""}" data-vibe="${OTHER}">${OTHER}</button></div>
+  <div class="other ${v===OTHER?"on":""}" id="oth-vibe"><input type="text" data-other="vibe" placeholder="Describe the vibe…" value="${esc(A.vibe?.other||"")}"></div></div>`;
+}
+function servicesHTML(){
+  return `<div class="q"><div class="t">Your service menu</div>
+   <div class="h">Easiest way: in the GlossGenius app, open your <b>Services</b> list and take screenshots (scroll and take more as needed). Upload them here and Claude will fill in the table. Then just fix anything that's off.</div>
+   <input type="file" id="shots" accept="image/*" multiple style="display:none">
+   <div class="chips"><button class="b clay" id="shotBtn">📷 Upload screenshots</button><button class="b sec" id="addRow">+ Add a service by hand</button></div>
+   <div id="shotMsg" class="h" style="margin-top:8px"></div>
+   <div style="overflow-x:auto;margin-top:8px"><table><thead><tr><th style="width:42%">Service</th><th>Price</th><th>Minutes</th><th></th></tr></thead><tbody id="svcBody"></tbody></table></div>
+   ${services.length?"":`<div class="h" style="margin-top:6px">No services yet.</div>`}</div>`;
+}
+function svcRows(){
+  const b=$("#svcBody"); if(!b) return;
+  b.innerHTML=services.map((s,i)=>`<tr><td><input data-svc="${i}" data-f="name" value="${esc(s.name)}" placeholder="Service"></td><td><input data-svc="${i}" data-f="price" value="${esc(s.price)}" placeholder="$"></td><td><input data-svc="${i}" data-f="minutes" value="${esc(s.minutes)}" inputmode="numeric" placeholder="min"></td><td><button class="x" data-rm="${i}">✕</button></td></tr>`).join("");
+}
+function ggHTML(){
+  return `<div class="note"><b>How to download your client list</b> (needs a computer, not the phone app):<br>1. Log in to GlossGenius in a web browser.<br>2. Go to <b>Clients</b>.<br>3. Tap <b>Export</b> — a CSV file downloads.<br><span style="color:var(--muted)">Client notes and future bookings aren't in that file; GlossGenius support can send those if you ask. Steps reported by other booking apps' help pages — the button name may differ slightly.</span><br>Don't upload that file here — send it to Chris privately.</div>`;
+}
+function render(){
+  window.scrollTo(0,0);
+  const scr=$("#screen");
+  if(step===-1){ $("#prog").style.display="none"; $("#nav").style.display="none";
+    scr.innerHTML=`<p class="lead" style="margin-top:24px">For Nicole 💛</p><h1>Let's design your perfect salon setup</h1>
+     <p>Your own beautiful website, easy online booking, payments, and simple money tracking — built around how <i>you</i> work.</p>
+     <div class="note">• About 20–30 minutes, ${S.length} short sections<br>• Tap answers — typing is optional<br>• Not sure? Tap <b>"You decide for me"</b> — totally fine<br>• It saves as you go, so you can stop and come back</div>
+     <button class="b pri" style="width:100%;margin-top:8px" id="start">${Object.keys(A).length>1?"Continue where I left off":"Let's start"}</button>
+     <div class="sec-list" style="margin-top:18px">${S.map((s,i)=>`<button data-jump="${i}"><span>${i+1}. ${esc(s.title)}</span><span class="${secDone(s)?"ok":""}">${secDone(s)?"✓":"›"}</span></button>`).join("")}</div>`;
+    return; }
+  if(step===S.length){ $("#prog").style.display="block"; $("#barFill").style.width="100%"; $("#secName").textContent="Review";
+    $("#nav").style.display="block"; $("#next").textContent=submitted?"Submitted ✓":"Send to Chris"; $("#next").disabled=submitted;
+    scr.innerHTML=`<h2>All done — review</h2><p class="lead">Tap a section to change anything.</p>
+      <div class="sec-list">${S.map((s,i)=>`<button data-jump="${i}"><span>${esc(s.title)}</span><span class="${secDone(s)?"ok":""}">${secDone(s)?"✓":"Skipped some"}</span></button>`).join("")}</div>
+      ${canSave?"":`<div class="note">Your answers are saved on this phone. When you're ready, tap <b>Send to Chris</b> and pick Messages or Mail.</div>`}
+      ${canSave?"":`<button class="b clay" style="width:100%;margin-top:10px" id="shareBtn">Send to Chris</button>`}
+      <button class="b sec" style="width:100%;margin-top:10px" id="copyBtn">Copy my answers</button>
+      <pre id="sum">${esc(summaryText())}</pre>`;
+    return; }
+  const s=S[step];
+  $("#prog").style.display="block"; $("#nav").style.display="block"; $("#next").disabled=false;
+  $("#barFill").style.width=((step+1)/(S.length+1)*100)+"%"; $("#secName").textContent=`${step+1} of ${S.length} · ${s.title}`;
+  $("#next").textContent= step===S.length-1?"Review":"Next";
+  scr.innerHTML=`<h2>${esc(s.title)}</h2><p class="lead">${esc(s.intro)}</p>
+    ${s.special==="services"?servicesHTML():""}${s.special==="vibe"?vibeHTML():""}${s.special==="gg"?ggHTML():""}
+    ${s.qs.map(qHTML).join("")}`;
+  if(s.special==="services") svcRows();
+}
+function answered(q){ const v=A[q.id]; if(q.type==="text"||q.type==="textarea") return !!(v&&String(v).trim()); return q.type==="multi"? (v?.sel?.length>0) : !!v?.sel; }
+function secDone(s){ return s.qs.every(answered) && (s.special!=="vibe"||!!A.vibe?.sel); }
+function fmtAns(q){ const v=A[q.id]; if(q.type==="text"||q.type==="textarea") return v||"—";
+  const sel=q.type==="multi"?(v?.sel||[]):(v?.sel?[v.sel]:[]); if(!sel.length) return "—";
+  return sel.map(x=>x===OTHER?("Other: "+(v.other||"")):x).join(", "); }
+function summaryText(){
+  let out="NICOLE — SALON SETUP ANSWERS\n";
+  S.forEach(s=>{ out+=`\n== ${s.title.toUpperCase()} ==\n`;
+    if(s.special==="vibe"){ const v=A.vibe; out+=`Overall vibe: ${v?.sel===OTHER?"Other: "+(v.other||""):(v?.sel||"—")}\n`; }
+    if(s.special==="services"){ out+=`Services:\n${services.length?services.map(x=>` - ${x.name} | ${x.price} | ${x.minutes} min`).join("\n"):" (none entered)"}\n`; }
+    s.qs.forEach(q=>{ out+=`${q.t}: ${fmtAns(q)}\n`; }); });
+  return out;
+}
+
+// ===== Events =====
+document.addEventListener("click",async e=>{
+  const t=e.target.closest("button"); if(!t) return;
+  if(t.id==="start"){ step=0; render(); return; }
+  if(t.dataset.jump!=null){ step=+t.dataset.jump; render(); return; }
+  if(t.id==="next" && step===S.length && !canSave){ $("#shareBtn")?.click(); return; }
+  if(t.id==="back"){ step=Math.max(-1,step-1); render(); return; }
+  if(t.id==="next"){ if(step===S.length){ submitted=true; await saveNow(); render(); $("#screen").insertAdjacentHTML("afterbegin",`<div class="note"><b>Thank you!</b> ${canSave?"Your answers are saved for Chris.":"Copy your answers and text them to Chris."}</div>`); return; } step++; render(); return; }
+  if(t.dataset.chip){ const q=S.flatMap(s=>s.qs).find(x=>x.id===t.dataset.chip); const val=t.dataset.val;
+    let v=A[q.id]||{}; if(q.type==="multi"){ let sel=[...(v.sel||[])];
+      if(val===AI) sel = sel.includes(AI)?[]:[AI]; else { sel=sel.filter(x=>x!==AI); sel = sel.includes(val)?sel.filter(x=>x!==val):[...sel,val]; if(q.max && sel.filter(x=>x!==OTHER).length>q.max){ sel=sel.slice(1);} }
+      v={...v,sel}; } else { v={...v,sel: v.sel===val?null:val}; }
+    A[q.id]=v; queueSave();
+    t.parentElement.querySelectorAll(".chip").forEach(c=>{ const on = q.type==="multi" ? (v.sel||[]).includes(c.dataset.val) : v.sel===c.dataset.val; c.classList.toggle("on",on); });
+    const o=$("#oth-"+q.id); const showO = q.type==="multi"?(v.sel||[]).includes(OTHER):v.sel===OTHER; o.classList.toggle("on",showO); if(showO) o.querySelector("input").focus();
+    return; }
+  if(t.dataset.vibe){ const val=t.dataset.vibe; A.vibe={...(A.vibe||{}),sel:A.vibe?.sel===val?null:val}; queueSave(); const keep=window.scrollY; render(); window.scrollTo(0,keep); return; }
+  if(t.id==="addRow"){ services.push({name:"",price:"",minutes:""}); queueSave(); svcRows(); return; }
+  if(t.dataset.rm!=null){ services.splice(+t.dataset.rm,1); queueSave(); svcRows(); return; }
+  if(t.id==="shotBtn"){ $("#shots").click(); return; }
+  if(t.id==="shareBtn"){ const text=summaryText();
+    if(navigator.share){ try{ await navigator.share({title:"Nicole's salon setup answers",text}); t.textContent="Sent ✓"; return; }catch(err){ if(err&&err.name==="AbortError") return; } }
+    try{ await navigator.clipboard.writeText(text); t.textContent="Copied — paste it into a text to Chris"; }catch(_){ t.textContent="Press and hold the text below to copy it"; } return; }
+  if(t.id==="copyBtn"){ try{ await navigator.clipboard.writeText(summaryText()); t.textContent="Copied ✓ — paste into a text to Chris"; }catch(_){ t.textContent="Couldn't copy — press and hold the text below to copy"; } return; }
+});
+document.addEventListener("input",e=>{
+  const el=e.target;
+  if(el.dataset.q){ A[el.dataset.q]=el.value; queueSave(); }
+  else if(el.dataset.other){ A[el.dataset.other]={...(A[el.dataset.other]||{}),other:el.value}; queueSave(); }
+  else if(el.dataset.svc!=null){ services[+el.dataset.svc][el.dataset.f]=el.value; queueSave(); }
+});
+document.addEventListener("change",async e=>{
+  if(e.target.id!=="shots") return;
+  const files=[...e.target.files]; e.target.value=""; if(!files.length) return;
+  const msg=$("#shotMsg");
+  if(!sample){ msg.textContent="Screenshot reading only works inside Claude. Easiest: text those screenshots to Chris and Claude will read them later — or add services by hand below."; return; }
+  let lim=null; try{ lim=await sample.limits(); }catch(_){}
+  if(lim && !lim.images){ msg.textContent="Reading images isn't available here — add services by hand."; return; }
+  msg.textContent=`Reading ${files.length} screenshot${files.length>1?"s":""}… (about 20–40 seconds)`;
+  try{
+    const res=await sample(`These are screenshots of a hair stylist's service menu from the GlossGenius app. Extract every service you can see. Return ONLY a JSON array like [{"name":"Women's Haircut","price":"$65","minutes":"60"}]. Keep the price text as shown (e.g. "$85+" or "$120–150"). minutes = duration in minutes as a number string, or "" if not shown. Don't invent services or prices. If the same service appears twice across screenshots, list it once.`,{images:files,cache:false,modelTier:"default"});
+    const m=res.text.match(/\[[\s\S]*\]/); const arr=m?JSON.parse(m[0]):[];
+    let added=0; arr.forEach(x=>{ if(!x||!x.name) return; if(services.some(s=>s.name.trim().toLowerCase()===String(x.name).trim().toLowerCase())) return; services.push({name:String(x.name),price:String(x.price||""),minutes:String(x.minutes||"")}); added++; });
+    queueSave(); svcRows(); msg.textContent = added?`Added ${added} service${added>1?"s":""}. Please check prices and times — fix anything that's off.`:"Couldn't find services in those images. Try clearer screenshots of the Services list.";
+  }catch(err){ msg.textContent = err?.code==="not_granted"?"Image reading wasn't allowed — add services by hand.": err?.code==="rate_limited"?"Too many tries right now — wait a minute and try again.":"Couldn't read those — try again or add by hand."; }
+});
+
+render();
+
+// ===== Boot capabilities =====
+(async()=>{
+  const c=window.claude; if(!c||!c.use){ $("#saved").textContent="Saved on this device"; return; }
+  db=await c.use("db"); sample=await c.use("sample");
+  if(db){ try{ const snap=await db.doc("questionnaires/nicole").get(); canSave=true;
+      if(snap.exists){ const d=snap.data(); if(d.updatedAt && Object.keys(A).length<=1){ A=d.answers||A; services=d.services||[]; } submitted=!!d.submitted; render(); }
+    }catch(_){ canSave=false; } }
+})();
+</script>
+</body>
+</html>
