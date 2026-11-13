@@ -87,8 +87,8 @@ const S = [
   {id:"specialties",t:"Which services do you want to be known for?",type:"multi",o:["Cuts","All-over color","Balayage / highlights","Natural or organic color","Henna","Gray blending","Curly cuts","Scalp treatments","Blowouts & styling","Bridal & events","Extensions","Men's cuts","Kids' cuts"]},
   {id:"years",t:"How many years have you been doing hair?",type:"single",o:["0–3","4–7","8–15","15+"]},
   {id:"setting",t:"Where do you work?",type:"single",o:["My own suite","Rented chair in a salon","Home studio","Mobile — I travel to clients","A mix"]},
-  {id:"location_now",t:"Current address or area to show (city is fine)",type:"text",ph:"e.g. Prescott, AZ"},
-  {id:"move_show",t:"With a possible St. George move, what should the site show?",type:"single",o:["Prescott now, switch later","Both locations","Prescott + \"St. George coming soon\"","City only, no address"]},
+  {id:"location_now",t:"Salon address or area (city is fine)",type:"text",ph:"e.g. Prescott, AZ",def:"Prescott, AZ"},
+  {id:"address_show",t:"How much of your location should the site show?",type:"single",o:["Full address","Street name & city only","City only — address after booking"]},
 ]},
 { id:"services", title:"Services & prices", intro:"GlossGenius doesn't let you export services, so let's skip the typing.", special:"services", qs:[
   {id:"price_display",t:"How should prices show on your site?",type:"single",o:["Exact prices","\"Starting at\" prices","Price ranges","Hide prices — consult first"]},
@@ -189,7 +189,7 @@ const S = [
   {id:"must_keep",t:"Anything you absolutely can't lose?",type:"text"},
   {id:"client_count",t:"About how many clients are in it?",type:"single",o:["Under 50","50–150","150–300","300+"]},
   {id:"export",t:"Client list export",type:"single",o:["I'll export it myself","Chris can help me","Not yet"]},
-  {id:"timing",t:"When should we switch?",type:"single",o:["As soon as it's ready","After the holidays","During a slow week","When we move"]},
+  {id:"timing",t:"When should we switch?",type:"single",o:["As soon as it's ready","After the holidays","During a slow week","In the new year"]},
   {id:"notify",t:"How should we tell clients about the new booking link?",type:"multi",o:["Text","Email","Instagram post","Tell them in person"]},
 ]},
 { id:"priorities", title:"What matters most", intro:"Last one!", qs:[
